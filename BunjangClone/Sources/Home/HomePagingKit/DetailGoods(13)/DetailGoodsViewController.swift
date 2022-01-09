@@ -12,12 +12,16 @@ import SafariServices
 
 
 
-class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate {
+class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
+    
     lazy var dataManater: DetailGoodsRequest = DetailGoodsRequest()
 
 //    var goodsImgList : [detailImgList] = []
 //    var goodsTagLIst : [detailTagList] = []
     var goodsImgList = [String]()
+//    let imgArrayCount = response.result?.imgList?.count ?? 0
+    var img = 0
+    var imgList = [String]()
     
     
     //MARK: - Properties
@@ -32,9 +36,7 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate {
     @IBOutlet weak var bottomView: UIView! //테두리
     @IBOutlet weak var bottomHeartView: UIButton! //테두리
     @IBOutlet weak var eventView: UIView!
-    
-    
-    
+    @IBOutlet weak var imageListCollectionView: UICollectionView!
     
     @IBOutlet weak var detailImgView: UIImageView!
     
@@ -68,6 +70,10 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate {
     //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.imageListCollectionView.delegate = self
+        self.imageListCollectionView.dataSource = self
+//        self.imageListCollectionView?.prefetchDataSource = self
+//        self.imageListCollectionView?.prefetchDataSource = self
         addContentScrollView()
         setPageControl()
         bottomView.layer.borderWidth = 0.5
@@ -160,11 +166,9 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate {
     }
     
     
-}
-
-
-//API
-extension DetailGoodsViewController {
+    
+    
+    //MARK: - API
     func didDetailGoodsCalled(_ response: DetailGoodsResponse) {
         
 
@@ -203,20 +207,62 @@ extension DetailGoodsViewController {
         detailCntFollowers.text = String(response.result?.cntFollowers ?? 0)
         
         
-        let imageArray = response.result?.imgList?[0].imgUrl ?? ""
-        let url = URL(string: imageArray)
-        let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
-        detailImgView.kf.setImage(with: url, options: [.processor(processer)])
-   
-//        let emptyList = Int()
-//        let imgArray = response.result?.imgList?[emptyList].imgUrl ?? ""
+//        let imageArray = response.result?.imgList?[0].imgUrl ?? ""
+//        let url = URL(string: imageArray)
+//        let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
+//        detailImgView.kf.setImage(with: url, options: [.processor(processer)])
         
         
         
+        
+        let imgArrayCount = response.result?.imgList?.count ?? 0
+//        var img = 0
+//        var imgList = [String]()
+        repeat {
+            let imageArray = response.result?.imgList?[img].imgUrl ?? ""
+            img += 1
+            imgList.append(imageArray)
+            print(imageArray)
+        } while img < imgArrayCount
+        print(imgList)
+        
+        let urls = imgList.map { URL(string: $0)! }
+        let prefetcher = ImagePrefetcher(urls: urls) {
+            skippedResources, failedResources, completedResources in
+            print("These resources are prefteched \(completedResources)")
+        }
+        prefetcher.start()
         
 
-        
     }
+    
 }
 
 
+
+extension DetailGoodsViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+//        let urls = indexPaths.flatMap { URL(string: $0.urls) }
+//        ImagePrefetcher(urls: urls).start()
+//    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return imgList.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailImageCollectionViewCell", for: indexPath) as? DetailImageCollectionViewCell else { return UICollectionViewCell() }
+        let url = URL(string: imgList[0])
+        let processer = DownsamplingImageProcessor(size: imageListCollectionView.bounds.size)
+        cell.detailGoodsImage.kf.setImage(with: url, options: [.processor(processer)])
+        return cell
+        
+    }
+
+
+}
+
+//        let imageArray = response.result?.imgList?[0].imgUrl ?? ""
+//        let url = URL(string: imageArray)
+//        let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
+//        detailImgView.kf.setImage(with: url, options: [.processor(processer)])
