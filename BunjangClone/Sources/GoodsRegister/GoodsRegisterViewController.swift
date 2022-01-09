@@ -108,7 +108,11 @@ class GoodsRegisterViewController: BaseViewController, UIScrollViewDelegate {
     
     @IBAction func locationBtn(_ sender: Any) {
         let locationStoryboard = UIStoryboard.init(name: "Location", bundle: nil)
-        let locationVC = locationStoryboard.instantiateViewController(identifier: "LocationViewController")
+        let locationVC = locationStoryboard.instantiateViewController(identifier: "LocationViewController") as! LocationViewController
+        locationVC.didSelectLocation = { [weak self] (selectedLocation : String) in
+            guard let self = self else { return }
+            self.locationLabel.text = selectedLocation
+        }
         self.navigationController?.pushViewController(locationVC, animated: true)
     }
     

@@ -18,8 +18,8 @@ class LocationViewController: BaseViewController {
     var locationItems: [items] = []
     
     
-//    var locationAdress: loca
-    
+    /// 위치가 선택이 되었다는 클로저
+    var didSelectLocation : ((String) -> Void)? = nil
     
     
     @IBOutlet weak var locationSearchTextfield: UITextField!
@@ -107,6 +107,7 @@ extension LocationViewController: UITableViewDelegate, UITableViewDataSource, lo
         let clickedAddress = locationItems[indexPath.row].roadAddress
         changeLocationLabel()
         print("클릭된 셀 \(clickedAddress!)")
+        didSelectLocation?(clickedAddress ?? "주소없음")
         navigationController?.popViewController(animated: true)
     }
     

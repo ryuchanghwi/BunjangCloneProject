@@ -15,10 +15,9 @@ import SafariServices
 class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate {
     lazy var dataManater: DetailGoodsRequest = DetailGoodsRequest()
 
-    var goodsImgList : [detailImgList] = []
-    var goodsTagLIst : [detailTagList] = []
-    
-    
+//    var goodsImgList : [detailImgList] = []
+//    var goodsTagLIst : [detailTagList] = []
+    var goodsImgList = [String]()
     
     
     //MARK: - Properties
@@ -202,12 +201,15 @@ extension DetailGoodsViewController {
         }
         detailGoodsCountLabel.text = String(response.result?.quantity ?? 0)
         detailCntFollowers.text = String(response.result?.cntFollowers ?? 0)
+        
+        
         let imageArray = response.result?.imgList?[0].imgUrl ?? ""
         let url = URL(string: imageArray)
         let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
         detailImgView.kf.setImage(with: url, options: [.processor(processer)])
    
-        
+//        let emptyList = Int()
+//        let imgArray = response.result?.imgList?[emptyList].imgUrl ?? ""
         
         
         

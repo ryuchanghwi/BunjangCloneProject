@@ -89,11 +89,12 @@
                                                 </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="msE-jT-f2I" secondAttribute="trailing" constant="30" id="5Xz-lU-qs4"/>
                                                 <constraint firstItem="0BZ-J3-ucu" firstAttribute="top" secondItem="ESB-Kn-YYD" secondAttribute="top" constant="20" id="CNn-gI-wTQ"/>
-                                                <constraint firstItem="msE-jT-f2I" firstAttribute="centerY" secondItem="ESB-Kn-YYD" secondAttribute="centerY" id="Jm7-hb-QGK"/>
                                                 <constraint firstItem="0BZ-J3-ucu" firstAttribute="centerY" secondItem="ESB-Kn-YYD" secondAttribute="centerY" id="LUa-8j-bxR"/>
                                                 <constraint firstItem="0BZ-J3-ucu" firstAttribute="leading" secondItem="ESB-Kn-YYD" secondAttribute="leadingMargin" id="Mgd-yU-s6u"/>
                                                 <constraint firstItem="msE-jT-f2I" firstAttribute="leading" secondItem="0BZ-J3-ucu" secondAttribute="trailing" constant="10" id="Orb-Gm-Rq8"/>
+                                                <constraint firstItem="msE-jT-f2I" firstAttribute="centerY" secondItem="ESB-Kn-YYD" secondAttribute="centerY" id="naE-Bo-PC8"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
