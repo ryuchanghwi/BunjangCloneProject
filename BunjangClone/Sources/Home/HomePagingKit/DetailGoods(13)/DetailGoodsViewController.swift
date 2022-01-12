@@ -18,13 +18,17 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
 
 //    var goodsImgList : [detailImgList] = []
 //    var goodsTagLIst : [detailTagList] = []
+    var arrImageName: [String] = ["banner1", "banner2", "banner3", "banner4"]
     var goodsImgList = [String]()
 //    let imgArrayCount = response.result?.imgList?.count ?? 0
     var img = 0
     var imgList = [String]()
+    var detailImgList: [detailImgList] = []
+//    var detailImageList: [imgList] = []
     
     
     //MARK: - Properties
+    @IBOutlet weak var detailImageCollectionView: UICollectionView!
     @IBOutlet weak var DetailImgScrollView: UIScrollView!
     @IBOutlet weak var detailPageControl: UIPageControl!
     @IBOutlet weak var detailScrollView: UIScrollView!
@@ -36,7 +40,8 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
     @IBOutlet weak var bottomView: UIView! //테두리
     @IBOutlet weak var bottomHeartView: UIButton! //테두리
     @IBOutlet weak var eventView: UIView!
-    @IBOutlet weak var imageListCollectionView: UICollectionView!
+
+    
     
     @IBOutlet weak var detailImgView: UIImageView!
     
@@ -61,21 +66,19 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
     @IBOutlet weak var detailCntFollowers: UILabel!
     
     
-    //이미지 데이터 배열
-    var detailImages = [ #imageLiteral(resourceName: "splashImg3"), #imageLiteral(resourceName: "splashImg4"), #imageLiteral(resourceName: "splashImg1"), #imageLiteral(resourceName: "splashImg2") ]
-    var detailImageList : [UIImage] = []
-    var detailImageView = [UIImageView]()
+
     var detailProductIndex : Int = 0
     
     //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.imageListCollectionView.delegate = self
-        self.imageListCollectionView.dataSource = self
-//        self.imageListCollectionView?.prefetchDataSource = self
-//        self.imageListCollectionView?.prefetchDataSource = self
-        addContentScrollView()
-        setPageControl()
+        self.detailImageCollectionView.delegate = self
+        self.detailImageCollectionView.dataSource = self
+//        self.imageListCollectionView.delegate = self
+//        self.imageListCollectionView.dataSource = self
+
+//        addContentScrollView()
+//        setPageControl()
         bottomView.layer.borderWidth = 0.5
         bottomView.layer.borderColor = UIColor.lightGray.cgColor
         bottomHeartView.layer.borderColor = UIColor.lightGray.cgColor
@@ -89,22 +92,23 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
         eventView.layer.cornerRadius = 5
         detailScrollView.delegate = self
         
+
     }
-    private func addContentScrollView() {
-        for i in 0..<detailImageList.count {
-            let imageView = UIImageView()
-            let xPos = self.view.frame.width * CGFloat(i)
-            imageView.frame = CGRect(x: xPos, y: 0, width: DetailImgScrollView.bounds.width, height: DetailImgScrollView.bounds.height)
-            imageView.image = detailImages[i]
-            DetailImgScrollView.addSubview(imageView)
-            DetailImgScrollView.contentSize.width = imageView.frame.width * CGFloat(i + 1)
-        }
-    }
+//    private func addContentScrollView() {
+//        for i in 0..<detailImageList.count {
+//            let imageView = UIImageView()
+//            let xPos = self.view.frame.width * CGFloat(i)
+//            imageView.frame = CGRect(x: xPos, y: 0, width: DetailImgScrollView.bounds.width, height: DetailImgScrollView.bounds.height)
+//            imageView.image = detailImages[i]
+//            DetailImgScrollView.addSubview(imageView)
+//            DetailImgScrollView.contentSize.width = imageView.frame.width * CGFloat(i + 1)
+//        }
+//    }
     
-    private func setPageControl() {
-        detailPageControl.numberOfPages = detailImages.count
-        
-    }
+//    private func setPageControl() {
+//        detailPageControl.numberOfPages = detailImages.count
+//
+//    }
     
     private func setPageControlSelectedPage(currentPage:Int) {
         detailPageControl.currentPage = currentPage
@@ -173,8 +177,6 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
         
 
         detailGoodLabel.text = response.result?.productName ?? ""
-        
-
         detailPriceLabel.text = String(response.result?.prices ?? 0)
         detailLocationLabel.text = response.result?.areaName ?? ""
         detailTimeLabel.text = response.result?.createdAt ?? ""
@@ -206,63 +208,39 @@ class DetailGoodsViewController : BaseViewController, UIScrollViewDelegate  {
         detailGoodsCountLabel.text = String(response.result?.quantity ?? 0)
         detailCntFollowers.text = String(response.result?.cntFollowers ?? 0)
         
+        detailImgList = response.result?.imgList ?? []
         
-//        let imageArray = response.result?.imgList?[0].imgUrl ?? ""
-//        let url = URL(string: imageArray)
-//        let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
-//        detailImgView.kf.setImage(with: url, options: [.processor(processer)])
+        detailImageCollectionView.reloadData()
         
-        
+
         
         
-        let imgArrayCount = response.result?.imgList?.count ?? 0
-//        var img = 0
-//        var imgList = [String]()
-        repeat {
-            let imageArray = response.result?.imgList?[img].imgUrl ?? ""
-            img += 1
-            imgList.append(imageArray)
-            print(imageArray)
-        } while img < imgArrayCount
-        print(imgList)
         
-        let urls = imgList.map { URL(string: $0)! }
-        let prefetcher = ImagePrefetcher(urls: urls) {
-            skippedResources, failedResources, completedResources in
-            print("These resources are prefteched \(completedResources)")
-        }
-        prefetcher.start()
         
 
     }
     
 }
-
-
 
 extension DetailGoodsViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-//        let urls = indexPaths.flatMap { URL(string: $0.urls) }
-//        ImagePrefetcher(urls: urls).start()
-//    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imgList.count
+        return detailImgList.count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailImageCollectionViewCell", for: indexPath) as? DetailImageCollectionViewCell else { return UICollectionViewCell() }
-        let url = URL(string: imgList[0])
-        let processer = DownsamplingImageProcessor(size: imageListCollectionView.bounds.size)
-        cell.detailGoodsImage.kf.setImage(with: url, options: [.processor(processer)])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "imageListCollectionViewCell", for: indexPath) as? imageListCollectionViewCell else { return imageListCollectionViewCell() }
+   
+        let imageURL = URL(string: detailImgList[indexPath.row].imgUrl ?? "")
+        cell.listImageView.kf.setImage(with: imageURL)
         return cell
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width: CGFloat = detailImageCollectionView.frame.width
+        let height : CGFloat = detailImageCollectionView.frame.height
+        return CGSize(width: width, height: height)
         
     }
-
-
+    
+    
+    
 }
-
-//        let imageArray = response.result?.imgList?[0].imgUrl ?? ""
-//        let url = URL(string: imageArray)
-//        let processer = DownsamplingImageProcessor(size: detailImgView.bounds.size)
-//        detailImgView.kf.setImage(with: url, options: [.processor(processer)])
